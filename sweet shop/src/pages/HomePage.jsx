@@ -29,6 +29,12 @@ const HomePage = () => {
             setSweets(response.data);
         } catch (error) {
             console.error("Failed to fetch sweets", error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                // Determine if we should redirect or just show empty
+                // For a homepage, maybe show a "Please login" message or redirect?
+                // Let's redirect to login if it's the main page load
+                // window.location.href = '/login'; 
+            }
         } finally {
             setLoading(false);
         }
