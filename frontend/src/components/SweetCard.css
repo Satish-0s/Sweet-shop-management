@@ -1,0 +1,66 @@
+.sweet-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s;
+}
+
+.sweet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sweet-card.out-of-stock {
+    opacity: 0.7;
+    background-color: #f9f9f9;
+}
+
+.sweet-details h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+}
+
+.category-tag {
+    background-color: #e9ecef;
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    color: #495057;
+}
+
+.price {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #28a745;
+    margin: 10px 0;
+}
+
+.quantity {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.purchase-btn {
+    width: 100%;
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.purchase-btn:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.purchase-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
