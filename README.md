@@ -1,5 +1,9 @@
 # Sweet Shop Management System
 
+> **⚠️ ADMIN ACCESS CREDENTIALS**  
+> **Email:** `satishkr4548@gmail.com`  
+> **Password:** `password1234`
+
 ## Description
 A comprehensive full-stack web application designed for managing a sweet shop inventory and sales. This system allows users to browse a delectable collection of sweets, filter them by category or price, and make purchases. Administrators have a dedicated dashboard to manage product listings, update stock levels, and oversee the shop's operations.
 
