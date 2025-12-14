@@ -33,7 +33,8 @@ const RegisterPage = () => {
             await register(apiData);
             navigate('/login');
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to register');
+            const message = err?.response?.data?.message || err?.message || 'Failed to register';
+            setError(message);
         } finally {
             setLoading(false);
         }

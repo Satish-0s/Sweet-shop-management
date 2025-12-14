@@ -16,8 +16,8 @@ const HomePage = () => {
         maxPrice: ''
     });
 
-    const fetchSweets = async () => {
-        setLoading(true);
+    const fetchSweets = async ({ showLoader = true } = {}) => {
+        if (showLoader) setLoading(true);
         try {
             const params = new URLSearchParams();
             if (filters.name) params.append('name', filters.name);
@@ -26,7 +26,17 @@ const HomePage = () => {
             const endpoint = filters.name ? `/sweets/search` : `/sweets`;
 
             const response = await api.get(endpoint, { params });
-            setSweets(response.data);
+            const serverSweets = Array.isArray(response.data) ? response.data : [];
+            localStorage.setItem('local_sweets_cache', JSON.stringify(serverSweets));
+
+            const deltaRaw = localStorage.getItem('local_qty_delta');
+            const delta = deltaRaw ? JSON.parse(deltaRaw) : {};
+            const merged = serverSweets.map((s) => {
+                const d = Number(delta?.[s.id] || 0);
+                const q = Number(s.quantity);
+                return { ...s, quantity: Math.max(0, q + d) };
+            });
+            setSweets(merged);
         } catch (error) {
             console.error("Failed to fetch sweets", error);
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
@@ -35,13 +45,25 @@ const HomePage = () => {
                 // Let's redirect to login if it's the main page load
                 // window.location.href = '/login'; 
             }
+            const cachedRaw = localStorage.getItem('local_sweets_cache');
+            const cached = cachedRaw ? JSON.parse(cachedRaw) : [];
+            const deltaRaw = localStorage.getItem('local_qty_delta');
+            const delta = deltaRaw ? JSON.parse(deltaRaw) : {};
+            const merged = (Array.isArray(cached) ? cached : []).map((s) => {
+                const d = Number(delta?.[s.id] || 0);
+                const q = Number(s.quantity);
+                return { ...s, quantity: Math.max(0, q + d) };
+            });
+
+            const name = (filters.name || '').trim().toLowerCase();
+            setSweets(name ? merged.filter((s) => String(s.name || '').toLowerCase().includes(name)) : merged);
         } finally {
-            setLoading(false);
+            if (showLoader) setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchSweets();
+        fetchSweets({ showLoader: true });
     }, [filters]);
 
     const handleSearchChange = (e) => {
@@ -58,6 +80,16 @@ const HomePage = () => {
     const handleEdit = (sweet) => {
         // Redirect or open modal - for now just alert
         alert(`Edit ${sweet.name} - Go to Admin Dashboard for full edit`);
+    };
+
+    const handlePurchaseRefresh = (payload) => {
+        if (payload && typeof payload === 'object' && typeof payload.id !== 'undefined' && typeof payload.delta !== 'undefined') {
+            setSweets((prev) =>
+                prev.map((s) => (s.id === payload.id ? { ...s, quantity: Math.max(0, Number(s.quantity) + Number(payload.delta)) } : s))
+            );
+            return;
+        }
+        fetchSweets({ showLoader: false });
     };
 
     return (
@@ -103,7 +135,7 @@ const HomePage = () => {
                                 <SweetCard
                                     key={sweet.id}
                                     sweet={sweet}
-                                    onPurchase={fetchSweets}
+                                    onPurchase={handlePurchaseRefresh}
                                     isAdmin={isAdmin}
                                     onDelete={handleDelete}
                                     onEdit={handleEdit}

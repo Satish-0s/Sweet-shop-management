@@ -35,8 +35,11 @@ const Navbar = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center focus:outline-none"
+                                className="flex items-center gap-3 focus:outline-none"
                             >
+                                <span className="text-sm font-semibold text-gray-800 truncate max-w-[140px] hidden sm:block">
+                                    {user.name || 'User'}
+                                </span>
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-orange-400 border-2 border-white shadow-sm flex items-center justify-center text-white font-bold text-xs">
                                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                                 </div>

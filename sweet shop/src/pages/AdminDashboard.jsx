@@ -91,73 +91,180 @@ const AdminDashboard = () => {
             </header>
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10 items-start">
 
-                        {/* Form Section */}
-                        <div className="lg:col-span-1">
-                            <div className="bg-white shadow sm:rounded-lg p-6">
-                                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                                    {isEditing ? 'Edit Sweet' : 'Add New Sweet'}
-                                </h3>
-                                <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="lg:col-span-4">
+                            <div className="bg-white shadow-sm ring-1 ring-gray-200 rounded-2xl p-6 sticky top-6 min-h-[calc(100vh-180px)] flex flex-col">
+                                <div className="flex items-start justify-between gap-4 mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                            {isEditing ? 'Edit Sweet' : 'Add New Sweet'}
+                                        </h3>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            {isEditing ? 'Update details and save changes.' : 'Add a new sweet to the catalog.'}
+                                        </p>
+                                    </div>
+                                    {isEditing && (
+                                        <button
+                                            type="button"
+                                            onClick={handleCancel}
+                                            className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                                        >
+                                            Cancel
+                                        </button>
+                                    )}
+                                </div>
+
+                                <form onSubmit={handleSubmit} className="space-y-4 flex-1 flex flex-col">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Name</label>
-                                        <input type="text" name="name" required value={formData.name} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" />
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            required
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 focus:ring-primary focus:border-primary"
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Category</label>
-                                        <input type="text" name="category" required value={formData.category} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" />
+                                        <input
+                                            type="text"
+                                            name="category"
+                                            required
+                                            value={formData.category}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 focus:ring-primary focus:border-primary"
+                                        />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Price</label>
-                                        <input type="number" step="0.01" name="price" required value={formData.price} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" />
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Price</label>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                name="price"
+                                                required
+                                                value={formData.price}
+                                                onChange={handleChange}
+                                                className="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 focus:ring-primary focus:border-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Quantity</label>
+                                            <input
+                                                type="number"
+                                                name="quantity"
+                                                required
+                                                value={formData.quantity}
+                                                onChange={handleChange}
+                                                className="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 focus:ring-primary focus:border-primary"
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Quantity</label>
-                                        <input type="number" name="quantity" required value={formData.quantity} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" />
-                                    </div>
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                                        <input type="url" name="image" value={formData.image} onChange={handleChange} placeholder="https://example.com/sweet.jpg" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" />
+                                        <input
+                                            type="url"
+                                            name="image"
+                                            value={formData.image}
+                                            onChange={handleChange}
+                                            placeholder="https://example.com/sweet.jpg"
+                                            className="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 focus:ring-primary focus:border-primary"
+                                        />
                                     </div>
-                                    <div className="flex space-x-3 pt-2">
-                                        <button type="submit" className="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                            {isEditing ? 'Update' : 'Add'}
+
+                                    <div className="pt-2 mt-auto">
+                                        <button
+                                            type="submit"
+                                            className="w-full bg-primary text-white py-3 px-4 rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-sm"
+                                        >
+                                            {isEditing ? 'Update Sweet' : 'Add Sweet'}
                                         </button>
-                                        {isEditing && (
-                                            <button type="button" onClick={handleCancel} className="flex-1 bg-white text-gray-700 border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50 focus:outline-none">
-                                                Cancel
-                                            </button>
-                                        )}
                                     </div>
                                 </form>
                             </div>
                         </div>
 
-                        {/* List Section */}
-                        <div className="lg:col-span-2">
-                            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                                <ul className="divide-y divide-gray-200">
-                                    {sweets.map(sweet => (
-                                        <li key={sweet.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                                            <div>
-                                                <p className="text-sm font-medium text-primary truncate">{sweet.name}</p>
-                                                <div className="flex space-x-4 text-sm text-gray-500">
-                                                    <span>{sweet.category}</span>
-                                                    <span>${sweet.price}</span>
-                                                    <span>Qty: {sweet.quantity}</span>
+                        <div className="lg:col-span-8">
+                            <div className="bg-white shadow-sm ring-1 ring-gray-200 rounded-2xl overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-base font-semibold text-gray-900">Sweets</h3>
+                                        <p className="text-sm text-gray-500">Manage your inventory</p>
+                                    </div>
+                                    <div className="text-sm text-gray-500">{loading ? 'Loading…' : `${sweets.length} items`}</div>
+                                </div>
+
+                                <div className="max-h-[calc(100vh-220px)] overflow-y-auto">
+                                    <div className="p-4 grid grid-cols-1 gap-4">
+                                        {sweets.map((sweet) => (
+                                            <div
+                                                key={sweet.id}
+                                                className="group bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                                            >
+                                                <div className="flex items-start gap-4">
+                                                    <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+                                                        {sweet.image ? (
+                                                            <img
+                                                                src={sweet.image}
+                                                                alt={sweet.name}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <span className="text-gray-400 text-sm">IMG</span>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex items-start justify-between gap-4">
+                                                            <div className="min-w-0">
+                                                                <p className="text-sm font-semibold text-gray-900 truncate">{sweet.name}</p>
+                                                                <p className="text-xs text-gray-500 mt-1">
+                                                                    {sweet.category}
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-3 shrink-0">
+                                                                <button
+                                                                    onClick={() => handleEdit(sweet)}
+                                                                    className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDelete(sweet.id)}
+                                                                    className="text-sm font-medium text-red-600 hover:text-red-900"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                                                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                                                                ${sweet.price}
+                                                            </span>
+                                                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                                                                Qty: {sweet.quantity}
+                                                            </span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="flex space-x-2">
-                                                <button onClick={() => handleEdit(sweet)} className="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Edit</button>
-                                                <button onClick={() => handleDelete(sweet.id)} className="text-red-600 hover:text-red-900 text-sm font-medium">Delete</button>
-                                            </div>
-                                        </li>
-                                    ))}
-                                    {sweets.length === 0 && !loading && (
-                                        <li className="p-4 text-center text-gray-500">No sweets available.</li>
-                                    )}
-                                </ul>
+                                        ))}
+
+                                        {sweets.length === 0 && !loading && (
+                                            <div className="p-10 text-center text-gray-500">No sweets available.</div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

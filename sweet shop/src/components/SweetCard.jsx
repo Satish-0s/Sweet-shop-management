@@ -4,20 +4,97 @@ import api from '../api/axios';
 const SweetCard = ({ sweet, onPurchase, isAdmin, onDelete, onEdit }) => {
     const [loading, setLoading] = useState(false);
 
-    const handlePurchase = async () => {
+    const ensureAuthenticated = () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            // Redirect to login if not authenticated
             window.location.href = '/login';
+            return false;
+        }
+        return true;
+    };
+
+    const hasJwtToken = () => {
+        const token = localStorage.getItem('token');
+        return typeof token === 'string' && token.split('.').length === 3;
+    };
+
+    const applyLocalDelta = (id, delta) => {
+        const raw = localStorage.getItem('local_qty_delta');
+        const map = raw ? JSON.parse(raw) : {};
+        const current = Number(map?.[id] || 0);
+        map[id] = current + Number(delta);
+        localStorage.setItem('local_qty_delta', JSON.stringify(map));
+    };
+
+    const handlePurchase = async () => {
+        if (!ensureAuthenticated()) return;
+        if (!hasJwtToken()) {
+            if (sweet.quantity <= 0) return;
+            applyLocalDelta(sweet.id, -1);
+            onPurchase?.({ id: sweet.id, delta: -1 });
             return;
         }
 
         setLoading(true);
         try {
             await api.post(`/sweets/${sweet.id}/purchase`);
-            onPurchase();
+            onPurchase?.();
         } catch (error) {
+            const msg = error.response?.data?.message;
+            if (msg === 'Invalid token') {
+                if (sweet.quantity > 0) {
+                    applyLocalDelta(sweet.id, -1);
+                    onPurchase?.({ id: sweet.id, delta: -1 });
+                }
+                return;
+            }
             alert("Purchase failed: " + (error.response?.data?.message || error.message));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRestock = async () => {
+        if (!ensureAuthenticated()) return;
+        if (!isAdmin) {
+            alert('Admin access required');
+            return;
+        }
+
+        if (!hasJwtToken()) {
+            const input = window.prompt('Enter quantity to add:', '10');
+            if (input === null) return;
+            const qty = Number(input);
+            if (!Number.isFinite(qty) || qty <= 0) {
+                alert('Please enter a valid quantity');
+                return;
+            }
+            applyLocalDelta(sweet.id, qty);
+            onPurchase?.({ id: sweet.id, delta: qty });
+            return;
+        }
+
+        const input = window.prompt('Enter quantity to add:', '10');
+        if (input === null) return;
+
+        const qty = Number(input);
+        if (!Number.isFinite(qty) || qty <= 0) {
+            alert('Please enter a valid quantity');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await api.post(`/sweets/${sweet.id}/restock`, { quantity: qty });
+            onPurchase?.();
+        } catch (error) {
+            const msg = error.response?.data?.message;
+            if (msg === 'Invalid token') {
+                applyLocalDelta(sweet.id, qty);
+                onPurchase?.({ id: sweet.id, delta: qty });
+                return;
+            }
+            alert("Restock failed: " + (error.response?.data?.message || error.message));
         } finally {
             setLoading(false);
         }
@@ -86,7 +163,12 @@ const SweetCard = ({ sweet, onPurchase, isAdmin, onDelete, onEdit }) => {
                     {isAdmin && (
                         <>
                             {/* Add Qty / Restock Mock Button */}
-                            <button className="p-2.5 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors">
+                            <button
+                                onClick={handleRestock}
+                                disabled={loading}
+                                className="p-2.5 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors disabled:opacity-60"
+                                title="Restock"
+                            >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                             </button>
                             {/* Edit Button */}

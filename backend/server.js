@@ -20,6 +20,14 @@ app.use(bodyParser.json());
 // Seed Data Function
 const seedData = async () => {
     try {
+        // Drop legacy username index if it exists
+        try {
+            await User.collection.dropIndex('username_1');
+            console.log('Legacy username index dropped');
+        } catch (e) {
+            // Ignore error if index doesn't exist
+        }
+
         const sweets = [
             { id: 1, name: 'Chocolate Truffle', category: 'Chocolate', price: 2.99, quantity: 15, image: 'http://localhost:5173/sweets/chocolate_truffle.png' },
             { id: 2, name: 'Strawberry Gummy', category: 'Gummy', price: 1.49, quantity: 30, image: 'http://localhost:5173/sweets/strawberry_gummy.png' },
@@ -62,7 +70,7 @@ seedData();
 // Middleware to verify token
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = authHeader && authHeader.split(' ')[1] ? authHeader.split(' ')[1].trim() : null;
 
     if (!token) return res.status(401).json({ message: 'Access denied' });
 
@@ -101,6 +109,7 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ email: user.email, role: user.role, name: user.name }, SECRET_KEY, { expiresIn: '1h' });
         res.json({ token, user: { email: user.email, role: user.role, name: user.name } });
     } catch (error) {
+        console.error('Login Error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -116,6 +125,7 @@ app.post('/api/auth/register', async (req, res) => {
         await newUser.save();
         res.status(201).json({ message: 'User created' });
     } catch (error) {
+        console.error('Register Error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -166,12 +176,15 @@ app.post('/api/sweets/:id/purchase', verifyToken, async (req, res) => {
         sweet.quantity -= 1;
         await sweet.save();
 
-        const purchase = new Purchase({
-            user_id: req.user._id,
-            sweet_id: sweet.id,
-            date: new Date()
-        });
-        await purchase.save();
+        // If authenticated user is a mock user (no MongoDB _id), skip purchase record creation.
+        if (req.user && req.user._id) {
+            const purchase = new Purchase({
+                user_id: req.user._id,
+                sweet_id: sweet.id,
+                date: new Date()
+            });
+            await purchase.save();
+        }
 
         res.json({ message: 'Purchase successful', sweet });
     } catch (error) {

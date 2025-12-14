@@ -2,9 +2,11 @@ import axios from 'axios';
 
 // Defaults to localhost:5000 if not specified, can be overridden by env var
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const TIMEOUT_MS = Number(import.meta.env.VITE_API_TIMEOUT_MS || 5000);
 
 const api = axios.create({
     baseURL: BASE_URL,
+    timeout: Number.isFinite(TIMEOUT_MS) ? TIMEOUT_MS : 5000,
     headers: {
         'Content-Type': 'application/json',
     },
